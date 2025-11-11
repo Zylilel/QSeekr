@@ -13,7 +13,6 @@ from typing import List, Dict
 
 app = FastAPI()
 
-# Load all questions from database at startup
 def load_database():
     with open("database/all_database.json", "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -64,7 +63,6 @@ def search_questions(query: str, top_n: int = 10) -> List[Dict]:
     for question in database:
         question_text = question.get("question_text", "")
         if question_text:
-            # Calculate similarity score using partial_ratio for better matching
             score = fuzz.partial_ratio(query.lower(), question_text.lower())
 
             results.append({
@@ -79,7 +77,6 @@ def search_questions(query: str, top_n: int = 10) -> List[Dict]:
                 "markscheme_images": question.get("markscheme_images", [])
             })
 
-    # Sort by score in descending order and return top_n
     results.sort(key=lambda x: x["score"], reverse=True)
     return results[:top_n]
 
@@ -96,7 +93,6 @@ async def search_question(query: str = Form(None), file: UploadFile = File(None)
     print(f"Searching for: {query}")
     print(f"Query length: {len(query)} characters")
 
-    # Perform search
     results = search_questions(query, top_n=10)
 
     print(f"Found {len(results)} results")
@@ -107,4 +103,5 @@ async def search_question(query: str = Form(None), file: UploadFile = File(None)
         "query": query,
         "results": results
     }
+
 
